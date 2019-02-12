@@ -22,7 +22,7 @@ function mydbg2($s, $level)
 	global $verbose2;
 	global $verbose_level;
 
-	if($verbose2 && ($level >= $verbose_level))
+	if($verbose2 && ($verbose_level >= $level))
 	{
 		echo "<p>$s</p>";
 	}
@@ -46,8 +46,19 @@ function myvardump($v)
 		var_dump($v);
 	}
 }
+function myvardump2($v, $level)
+{
+	global $verbose2;
+	global $verbose_level;
 
-function printGroupMemberships($user_id, $groupCategories, $myGroups, $dataportenGroups)
+	if($verbose2 && ($verbose_level >= $level))
+	{
+	    echo "<p>Verbose" . $level . ">=" . $verbose_level .":</p>";
+		var_dump($v);
+	}
+}
+
+function printGroupMemberships($user_id, $course_id, $groupCategories, $myGroups, $dataportenGroups)
 {
     global $verbose;
     if($verbose)
@@ -75,16 +86,21 @@ function printGroupMemberships($user_id, $groupCategories, $myGroups, $dataporte
         }
         echo $groupName . "</br>" . $groupDescription;
         echo "</td>";
-
         $dp = "<form method='post' action='worker.php'>  <div class='form-group'><select name='group'>";
         foreach ($dataportenGroups as $dataportenGroup)
         {
-            $value = "{\"name\":\"" . $dataportenGroup["displayName"] . "\",\"description\":\"" . $dataportenGroup["id"] . "\"}";
-            $dp .= "<option value='" . $value .  "'>" . $dataportenGroup["displayName"] . "</option>";
+            $membership = $dataportenGroup["membership"]["basic"];
+            $value = "{
+            \"name\":\"" . $dataportenGroup["displayName"] . "\",
+            \"description\":\"" . $dataportenGroup["id"] . "\",
+            \"membership\":\"" . $membership . 
+            "\"}";
+            $dp .= "<option value='" . $value .  "'>" . $dataportenGroup["displayName"] . "(" . $membership . ")</option>";
         }
         $dp .= "</select></div><div class='form-group'><button class='btn btn-primary'>Bli med</button></div>";
         $dp .= "<input type='hidden' name='groupCategoryId' value='" . $groupCategory["id"] . "'></input>";
         $dp .= "<input type='hidden' name='userId' value='" . $user_id . "'></input>";
+        $dp .= "<input type='hidden' name='courseId' value='" . $course_id . "'></input>";
         $dp .= "</form>";
         echo "<td>" . $dp . "</td></tr>";
     }
@@ -111,7 +127,7 @@ function printGroupsForCourse($user_id, $course_id, $dataportenGroups)
     mydbg2("<h3>" . $course["name"] . "</h3>",2);
     $groupCategories = getGroupCategories($course_id);
     $myGroups = getUserGroups($user_id);
-    printGroupMemberships($user_id, $groupCategories, $myGroups, $dataportenGroups);
+    printGroupMemberships($user_id, $course_id, $groupCategories, $myGroups, $dataportenGroups);
 }
 
 function printCanvasEnrollmentGroups($user_id, $canvasEnrollments, $dataportenGroups)

@@ -4,38 +4,33 @@ function getExtraUserInfoFromDataporten($access_token, $oauth2)
 {
     $user_info_url = "https://api.dataporten.no/userinfo/v1/userinfo";
     $user_info = $oauth2->get_identity($access_token, $user_info_url);
-    mydbg("getExtraUserInfoFromDataporten");
-    myvardump($user_info);
+    mydbg2("getExtraUserInfoFromDataporten",3);
+    myvardump2($user_info,3);
     return $user_info;
 }
 function printDataportenExtraUserInfo($extraUserInfo)
 {
-    global $verbose;
-    if(!$verbose) return;
-
-    echo "<h2>Extra user info</h2>";
-    myvardump($extraUserInfo);
+    mydbg2("<h2>Extra user info</h2>",3);
+    myvardump2($extraUserInfo,3);
 }
 
 function getUserInfoFromDataporten($access_token, $oauth2)
 {
     $user_url = "https://auth.dataporten.no/userinfo";
     $user = $oauth2->get_identity($access_token, $user_url);
-    mydbg("getUserInfoFromDataporten");
-    myvardump($user);
+    mydbg2("getUserInfoFromDataporten",3);
+    myvardump2($user,3);
     return $user;
 }
 
 function printDataportenUserInfo($userInfo)
 {
-    global $verbose;
-    if(!$verbose) return;
     $userid_sec = $userInfo["user"]["userid_sec"][0];
     $feideid = getFeideIdFromDataportenUserInfo($userInfo);
 
-    echo "<h2>UserInfo</h2>";
+    mydbg2("<h2>UserInfo</h2>",3);
 
-    myvardump($userInfo);
+    myvardump2($userInfo,3);
     echo $feideid;
 }
 
@@ -49,18 +44,11 @@ function getFeideIdFromDataportenUserInfo($userInfo)
 
 function printDataportenGroupsInfo($groupsInfo)
 {
-    global $verbose;
-    if(!$verbose) return;
-    
-    $stuff = <<<EOT
-    <h2>Groups in dataporten</h2>
-EOT;
-    myvardump($groupsInfo);
-    echo $stuff;
+    mydbg2("<h2>Groups in dataporten</h2>",3);
+    myvardump2($groupsInfo,3);
     foreach ($groupsInfo as $group)
     {    
-        
-        echo "<p>" . $group["id"] . "</p>";
+        mydbg2("<p>" . $group["id"] . "</p>",3);
     }
 }
 function getGroupsInfoFromDataporten($access_token, $oauth2)

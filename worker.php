@@ -11,10 +11,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $group = $_POST["group"];
     $groupCategoryId = $_POST["groupCategoryId"];
     $userId = $_POST["userId"];
+    $courseId = $_POST["courseId"];
     echo "Melder deg inn i " . $group;
     echo "<br/>GruppekategoriId: ". $groupCategoryId;
     echo "<br/>BrukerId: " . $userId;
-    AddUserToGroup($userId, $groupCategoryId, $group);
+    AddUserToGroup($userId, $courseId, $groupCategoryId, $group);
 }
 printDataportenHeading();
 $courseId = $_SESSION["courseId"];
@@ -27,6 +28,7 @@ printDataportenExtraUserInfo($extraUserInfo);
 printDataportenGroupsInfo($dataportenGroups);
 printCanvasHeading();
 $feideid = getFeideIdFromDataportenUserInfo($userInfo);
+mydbg2("FeideId: " . $feideid,3);
 $canvasUser = null;
 if($offline)
 {
