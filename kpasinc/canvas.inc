@@ -34,8 +34,10 @@ function mycurl($url, $fields, $post)
     return mycurlex($url, $fields, $post, $delete);
 }
 
-function mycurldelete($url)
+function mycurldelete($api_endpoint)
 {
+	global $site;
+	$url = $site . $api_endpoint;
     $post = false;
     $delete = true;
 	$fields = array();
@@ -47,7 +49,6 @@ function mygetcurl($api_endpoint)
 	global $site;
 	global $account_id;
 	$url = $site . $api_endpoint;
-	mydbg($url);
 	$post = 0;
 	$delete = 0;
 	$fields = array();
@@ -66,7 +67,6 @@ function mypostcurl($api_endpoint, $fields)
 	global $site;
 	global $account_id;
 	$url = $site . $api_endpoint;
-	mydbg($url);
 	$post = 1;
 	$result = mycurl($url, $fields, $post);
     return json_decode($result,true);
@@ -76,6 +76,8 @@ function mycurlex($url, $fields, $post, $delete)
 {
 	global $curl_verbose;
 	global $access_key;
+
+    mydbg2("mycurlex url:" .$url,2);
 	
 	$fields_string = urlify($fields); 
 	$curl = curl_init();
@@ -98,7 +100,8 @@ function mycurlex($url, $fields, $post, $delete)
 	}
 	else if($delete)
 	{
-    	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+	    mydbg("mycurlex: DELETE",2);
+    	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 	}
 	curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $access_key));
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER,TRUE);
@@ -261,7 +264,7 @@ function getRoleIdForPrincipal()
 
 function unenrollUserFromCourse($course_id, $enrollment_id)
 {
-    $uri = "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id;
+    $uri = "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
     mycurldelete($uri);
 }
 
@@ -270,9 +273,11 @@ function enrollUserInSection($user_id, $role_id, $course_id, $section_id)
     $currentEnrollments = getCanvasEnrollments($user_id);
     foreach ($currentEnrollments as $enrollment)
     {
-        $enrollment_id = $enrollment["id"];
-        echo "<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id;
-        unenrollUserFromCourse($course_id, $enrollment_id);
+        if($enrollment["course_id"] == $course_id) {
+            $enrollment_id = $enrollment["id"];
+            echo "<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id;
+            unenrollUserFromCourse($course_id, $enrollment_id);
+        }
     }
     return enrollUserInSectionEx($user_id, $role_id, $section_id);    
 }
