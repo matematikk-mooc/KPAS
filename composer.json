@@ -1,0 +1,6 @@
+{
+    "name": "uninettno/app-dataporten-phpdemo",
+    "require": {
+        "kasperrt/oauth2-client": "dev-master"
+    }
+}
