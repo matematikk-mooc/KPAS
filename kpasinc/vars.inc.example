@@ -3,6 +3,7 @@
 $verbose = FALSE;
 $verbose2 = FALSE;
 $verbose_level = 3;
+$curl_verbose = FALSE;
 $offline = FALSE;
 
 //Dataporten app
@@ -29,6 +30,14 @@ if(getenv('APPSETTING_DATAPORTEN_AZURE'))
     $access_key         = getenv('APPSETTING_CANVAS_TOKEN');
     $principalRoleType  = getenv('APPSETTING_CANVAS_PRINCIPAL_ROLE_TYPE');
     $account_id         = getenv('APPSETTING_CANVAS_ACCOUNT_ID');
+
+    //Logging
+    $verbose_level = getenv('APPSETTING_LOG_LEVEL');
+    if($verbose_level)
+    {
+        $verbose = TRUE;
+        $verbose2 = TRUE;
+    }
 }
 else
 {

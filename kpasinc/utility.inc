@@ -1,12 +1,7 @@
 <?php
 function mydbg($s)
 {
-	global $verbose;
-
-	if($verbose)
-	{
-		echo "<p>$s</p>";
-	}
+    mydbg2($s,1);
 }
 function myerror($s)
 {
@@ -39,12 +34,7 @@ function myjson($s)
 
 function myvardump($v)
 {
-	global $verbose;
-	if($verbose)
-	{
-	    echo "<p>Verbose:</p>";
-		var_dump($v);
-	}
+    myvardump2($v, 1);
 }
 function myvardump2($v, $level)
 {

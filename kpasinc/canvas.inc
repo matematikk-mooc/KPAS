@@ -74,7 +74,7 @@ function mypostcurl($api_endpoint, $fields)
 
 function mycurlex($url, $fields, $post, $delete)
 {
-	global $verbose;
+	global $curl_verbose;
 	global $access_key;
 	
 	$fields_string = urlify($fields); 
@@ -84,10 +84,10 @@ function mycurlex($url, $fields, $post, $delete)
 	// or the file specified using CURLOPT_STDERR.
 	curl_setopt($curl, CURLOPT_VERBOSE, true);
 
-	if($verbose)
+	if($curl_verbose)
 	{
-		$verbose = fopen('php://temp', 'w+');
-		curl_setopt($curl, CURLOPT_STDERR, $verbose);	    
+		$curl_verbose_file = fopen('php://temp', 'w+');
+		curl_setopt($curl, CURLOPT_STDERR, $curl_verbose_file);	    
 	}
 
 	curl_setopt($curl, CURLOPT_URL, $url); 
@@ -115,10 +115,10 @@ function mycurlex($url, $fields, $post, $delete)
 	}
 	mydbg("<p>Curl executed</p>");
 
-	if($verbose)
+	if($curl_verbose_file)
 	{
-		rewind($verbose);
-		$verboseLog = stream_get_contents($verbose);
+		rewind($curl_verbose_file);
+		$verboseLog = stream_get_contents($curl_verbose_file);
 
 		echo "Verbose information:\n<pre>", htmlspecialchars($verboseLog), "</pre>\n";        
 
@@ -226,6 +226,7 @@ function AddUserToGroup($userId, $courseId, $groupCategoryId, $jsonGroup)
     mydbg2("Membership:".$membership, 2);
     if(($membership == "owner") || ($membership == "admin"))
     {
+        echo "Du er gruppeeier og får tilgang til faglærermeny for din gruppe.";
         $roleId = getRoleIdForPrincipal();
     }
     $enrollment = enrollUserInSection($userId, $roleId, $courseId, $sectionId);
@@ -267,15 +268,17 @@ function unenrollUserFromCourse($course_id, $enrollment_id)
 function enrollUserInSection($user_id, $role_id, $course_id, $section_id)
 {
     $currentEnrollments = getCanvasEnrollments($user_id);
-    foreach ($enrollment as $enrollment)
+    foreach ($currentEnrollments as $enrollment)
     {
         $enrollment_id = $enrollment["id"];
+        echo "<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id;
         unenrollUserFromCourse($course_id, $enrollment_id);
     }
     return enrollUserInSectionEx($user_id, $role_id, $section_id);    
 }
 function enrollUserInSectionEx($user_id, $role_id, $section_id)
 {
+    echo "Legger deg til i seksjon " . $section_id;
 	$uri = "/api/v1/sections/" . $section_id . "/enrollments";
 	$fields = array( 
 		'enrollment[user_id]' => $user_id, 
@@ -289,15 +292,15 @@ function enrollUserInSectionEx($user_id, $role_id, $section_id)
 }
 function createSection($courseId, $sectionName)
 {
-    mydbg2("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.", 2);
+    echo("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.");
     $sectionId = sectionExist($courseId, $sectionName);
     if($sectionId)
     {
-        mydbg2("<br/>Seksjonen eksisterte og har id " . $sectionId, 2);
+        echo("<br/>Seksjonen eksisterte og har id " . $sectionId);
     }
     else
     {
-        mydbg2("<br/>Seksjonen eksisterte ikke. Oppretter den.", 2);
+        echo("<br/>Seksjonen eksisterte ikke. Oppretter den.");
         $createdSection = createSectionEx($courseId, $sectionName);
         myvardump2($createdSection,3);
         $sectionId = $createdSection["id"];
@@ -421,9 +424,7 @@ function getCanvasEnrollments($user_id)
 
 function printCanvasEnrollments($canvasEnrollments)
 {
-    global $verbose;
-    if(!$verbose) return;
-    echo "<h2>Canvas enrollments</h2>";
+    mydbg("<h2>Canvas enrollments</h2>");
     myvardump($canvasEnrollments);
 }
 
@@ -436,103 +437,12 @@ function getCanvasUserFromFeideId($feideid)
     return $result;
 }
 
-function userExist($epost)
-{
-	global $site;
-	global $account_id;
-	$url = $site . "/api/v1/users/sis_user_id:" . $epost;
-	$user_id = 0;
-	
-	mydbg("Searching for ". $epost);
-	mydbg($url);
-
-	$post = 0;
-	$fields = array();
-	$result = mycurl($url, $fields, $post);
-	if (!($result === FALSE)) 
-	{
-		mydbg("Call succeeded");
-		$content = json_decode($result,true);
-		//var_dump($content);
-
-		foreach($content as $key=>$value) 
-		{
-			if($key == "errors")
-			{
-				mydbg("User did not exist.");
-				break;
-			}
-			else 
-			{
-				mydbg("Key:");
-				myvardump($key);
-				mydbg("Value:");
-				myvardump($value); 
-				mydbg("Type:" . gettype($key));
-				if($key == "id")
-				{
-					myvardump($value);
-					if(sizeof($value))
-					{
-						mydbg("User exists");	
-						$user_id = $value;
-						mydbg("user id=" . $user_id);
-						break;
-					}
-				}
-				else
-				{
-					mydbg("User did not exist.");
-				}
-			}
-		}
-	}
-	else
-	{
-		mydbg("Call failed");
-	}
-	return $user_id;
-}
-
-
-
 function addUserToGroupId($user_id,$gid)
 {
-	global $site;
-	global $verbose;
-	$ret_value = 0;
-
-	$url = $site . "/api/v1/groups/" . $gid . "/memberships";
+	$uri = "/api/v1/groups/" . $gid . "/memberships";
 	$fields = array( 
 		user_id => $user_id
 	); 
-	
-	$post = 1;
-	$result = mycurl($url, $fields, $post);
-	if (!($result === FALSE)) 
-	{
-		$content = json_decode($result,true);
-
-		foreach($content as $key=>$value) 
-		{
-			mydbg(gettype($key));
-			mydbg(gettype($value));
-			if($key == "errors")
-			{
-			    $ret_value = 0;
-			    myerror("User:" . $user_id);
-				HandleError($result, $url);
-			}
-			else 
-			{
-				$ret_value = 1;
-//				var_dump($key);
-//				var_dump($value); 
-			}
-		}
-	}
-	return $ret_value;
+	return mypostcurl($uri, $fields);
 }
-
-
 ?>
