@@ -17,7 +17,7 @@ $principalRoleType = "Rektor";
 $account_id = 1;
 
 
-if(getenv('APPSETTING_DATAPORTEN_AZURE')
+if(getenv('APPSETTING_DATAPORTEN_AZURE'))
 {
     //Dataporten app
     $client_id      = getenv('APPSETTING_DATAPORTEN_CLIENT_ID');
