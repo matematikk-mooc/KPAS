@@ -1,20 +1,48 @@
 <?php
 //DEBUGGING TRUE=ON
-$verbose = TRUE;
-$verbose2 = TRUE;
-$verbose_level = 2;
+$verbose = FALSE;
+$verbose2 = FALSE;
+$verbose_level = 3;
 $offline = FALSE;
 
-//Dataporten app - dashboard.dataporten.no
+//Dataporten app
 $client_id = "";
 $client_secret = "";
-$redirect_uri = "http://localhost:8880/kpas/index.php";
+$redirect_uri = "";
 
 //Canvas connection
-$site = "https://beta.kompetanse.udir.no";
+$site = "";
 $access_key = "";
-$account_id =1;
+$principalRoleType = "Rektor";
+$account_id = 1;
 
+
+if(getenv('APPSETTING_DATAPORTEN_AZURE')
+{
+    //Dataporten app
+    $client_id      = getenv('APPSETTING_DATAPORTEN_CLIENT_ID');
+    $client_secret  = getenv('APPSETTING_DATAPORTEN_CLIENT_SECRET');
+    $redirect_uri   = getenv('APPSETTING_DATAPORTEN_REDIRECT_URI');
+
+    //Canvas connection
+    $site               = getenv('APPSETTING_CANVAS_URI');
+    $access_key         = getenv('APPSETTING_CANVAS_TOKEN');
+    $principalRoleType  = getenv('APPSETTING_CANVAS_PRINCIPAL_ROLE_TYPE');
+    $account_id         = getenv('APPSETTING_CANVAS_ACCOUNT_ID');
+}
+else
+{
+    //Dataporten app
+    $client_id      = "";
+    $client_secret  = "";
+    $redirect_uri   = "http://localhost:8880/kpas/index.php";
+
+    //Canvas connection
+    $site               = "https://beta.kompetanse.udir.no";
+    $access_key         = "";
+    $principalRoleType  = "Rektor";
+    $account_id         =1;
+}
 //If testing functionality offline, the variables below are used.
 $offlineUserInfo = '{ "user": { "userid_sec": [ "feide:ath@udir.no" ], "userid": "d52f6a3b-060f-42eb-a295-ba230f621ace", "name": "Erlend Thune", "profilephoto": "p:1a888a27-5459-45cd-a029-608f73033974" }, "audience": "251def53-4e31-4269-95f2-5cc824e8d509" }';
 $offlineExtraUserInfo = '{ "eduPersonAffiliation": [ "Employee", "Member", "Staff" ], "sn": "Thune", "cn": "Erlend Thune", "title": "seniorr\u00e5dgiver", "norEduPersonLegalName": "Erlend Thune", "uid": [ "ETH" ], "eduPersonPrincipalName": "eth@udir.no", "displayName": "Erlend Thune", "manager": "CN=\u00d8ystein Nilsen,OU=Tromso,OU=Brukere,DC=ls,DC=no", "givenName": "Erlend" }';
