@@ -225,15 +225,21 @@ function AddUserToGroup($userId, $courseId, $groupCategoryId, $jsonGroup)
     $sectionId = createSection($courseId, $sectionName);    
     mydbg2("Section:" . $sectionId, 2);
 
-    $roleId = "StudentEnrollment";
     mydbg2("Membership:".$membership, 2);
+
+    echo "<br/>Fjerner tidligere medlemskap.";
+    unenrollUserFromCourse($userId, $courseId);
+
+    echo "<br/>Legger deg til som student.";
+    $enrollment = enrollStudentInSection($userId, $courseId, $sectionId);
+    myvardump2("Studentenrollment:" . $enrollment,2);
+
     if(($membership == "owner") || ($membership == "admin"))
     {
-        echo "Du er gruppeeier og får tilgang til faglærermeny for din gruppe.";
-        $roleId = getRoleIdForPrincipal();
+        echo "<br/>Du er gruppeeier eller -admin og får tilgang til skoleledermeny for din gruppe.";
+        $enrollment = enrollPrincipalInSection($userId, $courseId, $sectionId);
+        myvardump2("Studentenrollment:" . $enrollment,2);
     }
-    $enrollment = enrollUserInSection($userId, $roleId, $courseId, $sectionId);
-    myvardump2("Enrollment:" . $enrollment,2);
 
     echo "<br/>Legger bruker med id " . $userId . " til gruppekategori med id " . $groupCategoryId . " i gruppen med id " . $groupId;
     if(AddUserToGroupId($userId, $groupId))
@@ -242,17 +248,16 @@ function AddUserToGroup($userId, $courseId, $groupCategoryId, $jsonGroup)
     }
 }
 
-function getRoleIdForPrincipal()
+function getRoleIdFor($roleType)
 {
     global $account_id;
-    global $principalRoleType;
     $roleId = 0;
     $uri = "/api/v1/accounts/" . $account_id. "/roles";
     $roles = mygetcurl($uri);
     myvardump2($roles, 3);
     foreach ($roles as $role)
     {
-        if($role["role"] == $principalRoleType)
+        if($role["role"] == $roleType)
         {
             myvardump($role,2);
             $roleId = $role["id"];
@@ -262,13 +267,7 @@ function getRoleIdForPrincipal()
     return $roleId;
 }
 
-function unenrollUserFromCourse($course_id, $enrollment_id)
-{
-    $uri = "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
-    mycurldelete($uri);
-}
-
-function enrollUserInSection($user_id, $role_id, $course_id, $section_id)
+function unenrollUserFromCourse($user_id, $course_id)
 {
     $currentEnrollments = getCanvasEnrollments($user_id);
     foreach ($currentEnrollments as $enrollment)
@@ -276,25 +275,60 @@ function enrollUserInSection($user_id, $role_id, $course_id, $section_id)
         if($enrollment["course_id"] == $course_id) {
             $enrollment_id = $enrollment["id"];
             echo "<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id;
-            unenrollUserFromCourse($course_id, $enrollment_id);
+            $uri = "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
+            mycurldelete($uri);
         }
     }
-    return enrollUserInSectionEx($user_id, $role_id, $section_id);    
 }
-function enrollUserInSectionEx($user_id, $role_id, $section_id)
+
+function enrollPrincipalInSection($user_id, $course_id, $section_id)
 {
-    echo "Legger deg til i seksjon " . $section_id;
-	$uri = "/api/v1/sections/" . $section_id . "/enrollments";
-	$fields = array( 
-		'enrollment[user_id]' => $user_id, 
-		'enrollment[role_id]' => $role_id, 
-		'enrollment[enrollment_state]' => "active",
-		'enrollment[limit_privileges_to_course_section]' => "true",
-		'enrollment[self_enrolled]' => 'true'
-	); 
-	$enrollment = mypostcurl($uri, $fields);
+    global $principalRoleType;
+    $enrollment = null;
+    $role_id = getRoleIdFor($principalRoleType);
+    if($role_id)
+    {
+        echo "Legger deg til i seksjon " . $section_id . " som skoleleder.";
+        $enrollment = enrollInSection($user_id, $role_id, $course_id, $section_id);
+    }
+    else
+    {
+        echo "Kunne ikke finne rolle-id for skoleleder.";
+    }
+    return $enrollment;
+}
+
+function enrollInSection($user_id, $role_id, $course_id, $section_id)
+{
+    $uri = "/api/v1/sections/" . $section_id . "/enrollments";
+    $fields = array( 
+        'enrollment[user_id]' => $user_id, 
+        'enrollment[role_id]' => $role_id, 
+        'enrollment[enrollment_state]' => "active",
+        'enrollment[limit_privileges_to_course_section]' => "true",
+        'enrollment[self_enrolled]' => 'true'
+    ); 
+    $enrollment = mypostcurl($uri, $fields);
 	return $enrollment;
 }
+
+function enrollStudentInSection($user_id, $course_id, $section_id)
+{
+    $roleType = "StudentEnrollment";
+    $enrollment = null;
+    $role_id = getRoleIdFor($roleType);
+    if($role_id)
+    {
+        echo "Legger deg til i seksjon " . $section_id . " som student.";
+	    $enrollment = enrollInSection($user_id, $role_id, $course_id, $section_id);
+	}
+	else
+	{
+	    echo "Kunne ikke finne rolle-id for student.";
+	}
+	return $enrollment;
+}
+
 function createSection($courseId, $sectionName)
 {
     echo("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.");
