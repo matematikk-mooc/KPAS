@@ -3,19 +3,17 @@ session_start();
 //require_once 'vendor/autoload.php';
 require_once 'kpasinc/dataporten.inc';
 require_once 'kpasinc/vars.inc';
+require_once 'kpasinc/curlutility.inc';
 require_once 'kpasinc/canvas.inc';
 require_once 'kpasinc/utility.inc';
 
 printHtmlHeader();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $group = $_POST["group"];
-    $groupCategoryId = $_POST["groupCategoryId"];
-    $userId = $_POST["userId"];
-    $courseId = $_POST["courseId"];
+    $jsonGroup = $_POST["group"];
+    $group = json_decode($jsonGroup, true);
     echo "Melder deg inn i " . $group;
-    echo "<br/>GruppekategoriId: ". $groupCategoryId;
-    echo "<br/>BrukerId: " . $userId;
-    AddUserToGroup($userId, $courseId, $groupCategoryId, $group);
+    $result = AddUserToGroup($group);
+    echo $result;
 }
 printDataportenHeading();
 $courseId = $_SESSION["courseId"];

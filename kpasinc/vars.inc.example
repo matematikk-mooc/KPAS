@@ -13,7 +13,7 @@ $redirect_uri = "";
 
 //Canvas connection
 $site = "";
-$access_key = "";
+$canvas_access_key = "";
 $principalRoleType = "Rektor";
 $account_id = 1;
 
@@ -27,7 +27,7 @@ if(getenv('APPSETTING_DATAPORTEN_AZURE'))
 
     //Canvas connection
     $site               = getenv('APPSETTING_CANVAS_URI');
-    $access_key         = getenv('APPSETTING_CANVAS_TOKEN');
+    $canvas_access_key         = getenv('APPSETTING_CANVAS_TOKEN');
     $principalRoleType  = getenv('APPSETTING_CANVAS_PRINCIPAL_ROLE_TYPE');
     $account_id         = getenv('APPSETTING_CANVAS_ACCOUNT_ID');
 
@@ -48,7 +48,7 @@ else
 
     //Canvas connection
     $site               = "https://beta.kompetanse.udir.no";
-    $access_key         = "";
+    $canvas_access_key         = "";
     $principalRoleType  = "Rektor";
     $account_id         =1;
 }

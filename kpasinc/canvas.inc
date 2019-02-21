@@ -11,140 +11,6 @@ Todo   :Current version tested with feide addresses only.
 */
 
 
-function HandleError($result, $url)
-{
-	echo "<p>$url</p>";
-	var_dump($result);
-}
-function urlify($fields)
-{
-	//url-ify the data for the POST
-	$fields_string = "";
-	foreach($fields as $key=>$value) 
-	{ 
-		$fields_string .= $key.'='.$value.'&'; 
-	}
-	rtrim($fields_string, '&');
-	return $fields_string;
-}
-
-function mycurl($url, $fields, $post)
-{
-    $delete = false;
-    return mycurlex($url, $fields, $post, $delete);
-}
-
-function mycurldelete($api_endpoint)
-{
-	global $site;
-	$url = $site . $api_endpoint;
-    $post = false;
-    $delete = true;
-	$fields = array();
-    return mycurlex($url, $fields, $post, $delete);
-}
-
-function mygetcurl($api_endpoint)
-{
-	global $site;
-	global $account_id;
-	$url = $site . $api_endpoint;
-	$post = 0;
-	$delete = 0;
-	$fields = array();
-	$result = mycurl($url, $fields, $post);
-	if (!($result === FALSE)) 
-	{
-        $content = json_decode($result,true);
-        myvardump($content);
-        return $content;
-    }
-    return null;
-}
-
-function mypostcurl($api_endpoint, $fields)
-{
-	global $site;
-	global $account_id;
-	$url = $site . $api_endpoint;
-	$post = 1;
-	$result = mycurl($url, $fields, $post);
-    return json_decode($result,true);
-}
-
-function mycurlex($url, $fields, $post, $delete)
-{
-	global $curl_verbose;
-	global $access_key;
-
-    mydbg2("mycurlex url:" .$url,2);
-	
-	$fields_string = urlify($fields); 
-	$curl = curl_init();
-
-	// CURLOPT_VERBOSE: TRUE to output verbose information. Writes output to STDERR, 
-	// or the file specified using CURLOPT_STDERR.
-	curl_setopt($curl, CURLOPT_VERBOSE, true);
-
-	if($curl_verbose)
-	{
-		$curl_verbose_file = fopen('php://temp', 'w+');
-		curl_setopt($curl, CURLOPT_STDERR, $curl_verbose_file);	    
-	}
-
-	curl_setopt($curl, CURLOPT_URL, $url); 
-	if($post)
-	{
-		curl_setopt($curl, CURLOPT_POST, count($fields));
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields_string);
-	}
-	else if($delete)
-	{
-	    mydbg("mycurlex: DELETE",2);
-    	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-	}
-	curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $access_key));
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER,TRUE);
-	
-
-	mydbg("<p>Executing curl start</p>");
-
-	$result = curl_exec($curl);
-	
-	if ($result === FALSE) 
-	{
-		printf("cUrl error (#%d): %s<br>\n", curl_errno($curl),
-			   htmlspecialchars(curl_error($curl)));
-	}
-	mydbg("<p>Curl executed</p>");
-
-	if($curl_verbose_file)
-	{
-		rewind($curl_verbose_file);
-		$verboseLog = stream_get_contents($curl_verbose_file);
-
-		echo "Verbose information:\n<pre>", htmlspecialchars($verboseLog), "</pre>\n";        
-
-		$version = curl_version();
-		extract(curl_getinfo($curl));
-		$metrics = <<<EOD
-URL....: $url
-Code...: $http_code ($redirect_count redirect(s) in $redirect_time secs)
-Content: $content_type Size: $download_content_length (Own: $size_download) Filetime: $filetime
-Time...: $total_time Start @ $starttransfer_time (DNS: $namelookup_time Connect: $connect_time Request: $pretransfer_time)
-Speed..: Down: $speed_download (avg.) Up: $speed_upload (avg.)
-Curl...: v{$version['version']}
-EOD;
-	}
-
-	curl_close($curl);
-	return $result;
-}
-
-
-//array(6) { ["id"]=> int(1545) ["name"]=> string(22) "test13@erlendthune.com" ["sortable_name"]=> string(22) "test13@erlendthune.com" ["short_name"]=> string(22) "test13@erlendthune.com" ["login_id"]=> string(22) "test13@erlendthune.com" ["locale"]=> NULL } 
-//array(5) { ["id"]=> int(1545) ["name"]=> string(22) "test13@erlendthune.com" ["sortable_name"]=> string(22) "test13@erlendthune.com" ["short_name"]=> string(22) "test13@erlendthune.com" ["login_id"]=> string(22) "test13@erlendthune.com" } 
-
 
 function getUserId($arr)
 {
@@ -185,21 +51,25 @@ function getCanvasUserIdFromCanvasUser($canvasUser)
 function getCanvasCourse($course_id)
 {
     global $offline;
+    global $site;
+    global $canvas_access_key;
     if($offline)
     {
         global $offlineCourse;
         return json_decode($offlineCourse, true);
     }
-    $api_endpoint = "/api/v1/courses/" . $course_id;
-    $result = mygetcurl($api_endpoint);
+    $api_endpoint = $site . "/api/v1/courses/" . $course_id;
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
 
 function getSections($courseId)
 {
-    $uri = "/api/v1/courses/" . $courseId . "/sections";
+    global $site;
+    global $canvas_access_key;
+    $uri = $site ."/api/v1/courses/" . $courseId . "/sections";
     mydbg2($uri, 2);
-    $result = mygetcurl($uri);
+    $result = mygetcurl($uri, $canvas_access_key);
     myvardump2($result, 2);
     return $result;
 }
@@ -207,18 +77,23 @@ function getSections($courseId)
 
 function getGroups($group_category_id)
 {
-    $api_endpoint = "/api/v1/group_categories/" . $group_category_id . "/groups?per_page=999";
-    $result = mygetcurl($api_endpoint);
+    global $site;
+    global $canvas_access_key;
+
+    $api_endpoint = $site . "/api/v1/group_categories/" . $group_category_id . "/groups?per_page=999";
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
-function AddUserToGroup($userId, $courseId, $groupCategoryId, $jsonGroup)
+function AddUserToGroup($group)
 {
 //    echo $jsonGroup;
-    $group = json_decode($jsonGroup, true);
 //    var_dump($group);
     $groupName = $group["name"];
     $groupDescription = $group["description"];
     $membership = $group["membership"];
+    $groupCategoryId = $group["group_category_id"];
+    $userId = $group["user_id"];
+    $courseId = $group["course_id"];
 
     $groupId = createGroup($groupCategoryId, $groupName, $groupDescription);
     $sectionName = $groupName . ":" . $groupDescription;
@@ -227,33 +102,38 @@ function AddUserToGroup($userId, $courseId, $groupCategoryId, $jsonGroup)
 
     mydbg2("Membership:".$membership, 2);
 
-    echo "<br/>Fjerner tidligere medlemskap.";
+    mydbg2("<br/>Fjerner tidligere medlemskap.",2);
     unenrollUserFromCourse($userId, $courseId);
 
-    echo "<br/>Legger deg til som student.";
+    mydbg2("<br/>Legger deg til som student.",2);
     $enrollment = enrollStudentInSection($userId, $courseId, $sectionId);
     myvardump2("Studentenrollment:" . $enrollment,2);
 
     if(($membership == "owner") || ($membership == "admin"))
     {
-        echo "<br/>Du er gruppeeier eller -admin og får tilgang til skoleledermeny for din gruppe.";
+        mydbg2("<br/>Du er gruppeeier eller -admin og får tilgang til skoleledermeny for din gruppe.",2);
         $enrollment = enrollPrincipalInSection($userId, $courseId, $sectionId);
         myvardump2("Studentenrollment:" . $enrollment,2);
     }
 
-    echo "<br/>Legger bruker med id " . $userId . " til gruppekategori med id " . $groupCategoryId . " i gruppen med id " . $groupId;
+    mydbg2("<br/>Legger bruker med id " . $userId . " til gruppekategori med id " . $groupCategoryId . " i gruppen med id " . $groupId,2);
     if(AddUserToGroupId($userId, $groupId))
     {
-        echo "<br/>Brukeren ble lagt til.";
+        mydbg2("<br/>Brukeren ble lagt til.",2);
+        return "Success";
     }
+    return "Failure";
 }
 
 function getRoleIdFor($roleType)
 {
     global $account_id;
+    global $site;
+    global $canvas_access_key;
+    
     $roleId = 0;
-    $uri = "/api/v1/accounts/" . $account_id. "/roles";
-    $roles = mygetcurl($uri);
+    $uri = $site . "/api/v1/accounts/" . $account_id. "/roles";
+    $roles = mygetcurl($uri, $canvas_access_key);
     myvardump2($roles, 3);
     foreach ($roles as $role)
     {
@@ -269,14 +149,16 @@ function getRoleIdFor($roleType)
 
 function unenrollUserFromCourse($user_id, $course_id)
 {
+    global $site;
+    global $canvas_access_key;
     $currentEnrollments = getCanvasEnrollments($user_id);
     foreach ($currentEnrollments as $enrollment)
     {
         if($enrollment["course_id"] == $course_id) {
             $enrollment_id = $enrollment["id"];
-            echo "<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id;
-            $uri = "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
-            mycurldelete($uri);
+            mydbg2("<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id,2);
+            $uri = $site . "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
+            mycurldelete($uri, $canvas_access_key);
         }
     }
 }
@@ -288,19 +170,21 @@ function enrollPrincipalInSection($user_id, $course_id, $section_id)
     $role_id = getRoleIdFor($principalRoleType);
     if($role_id)
     {
-        echo "Legger deg til i seksjon " . $section_id . " som skoleleder.";
+        mydbg2("Legger deg til i seksjon " . $section_id . " som skoleleder.",2);
         $enrollment = enrollInSection($user_id, $role_id, $course_id, $section_id);
     }
     else
     {
-        echo "Kunne ikke finne rolle-id for skoleleder.";
+        mydbg2("Kunne ikke finne rolle-id for skoleleder.",2);
     }
     return $enrollment;
 }
 
 function enrollInSection($user_id, $role_id, $course_id, $section_id)
 {
-    $uri = "/api/v1/sections/" . $section_id . "/enrollments";
+    global $site;
+    global $canvas_access_key;
+    $uri = $site . "/api/v1/sections/" . $section_id . "/enrollments";
     $fields = array( 
         'enrollment[user_id]' => $user_id, 
         'enrollment[role_id]' => $role_id, 
@@ -308,7 +192,7 @@ function enrollInSection($user_id, $role_id, $course_id, $section_id)
         'enrollment[limit_privileges_to_course_section]' => "true",
         'enrollment[self_enrolled]' => 'true'
     ); 
-    $enrollment = mypostcurl($uri, $fields);
+    $enrollment = mypostcurl($uri, $fields, $canvas_access_key);
 	return $enrollment;
 }
 
@@ -319,27 +203,27 @@ function enrollStudentInSection($user_id, $course_id, $section_id)
     $role_id = getRoleIdFor($roleType);
     if($role_id)
     {
-        echo "Legger deg til i seksjon " . $section_id . " som student.";
+        mydbg2("Legger deg til i seksjon " . $section_id . " som student.",2);
 	    $enrollment = enrollInSection($user_id, $role_id, $course_id, $section_id);
 	}
 	else
 	{
-	    echo "Kunne ikke finne rolle-id for student.";
+	    mydbg2("Kunne ikke finne rolle-id for student.",2);
 	}
 	return $enrollment;
 }
 
 function createSection($courseId, $sectionName)
 {
-    echo("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.");
+    mydbg2("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.",2);
     $sectionId = sectionExist($courseId, $sectionName);
     if($sectionId)
     {
-        echo("<br/>Seksjonen eksisterte og har id " . $sectionId);
+        mydbg2("<br/>Seksjonen eksisterte og har id " . $sectionId,2);
     }
     else
     {
-        echo("<br/>Seksjonen eksisterte ikke. Oppretter den.");
+        mydbg2("<br/>Seksjonen eksisterte ikke. Oppretter den.",2);
         $createdSection = createSectionEx($courseId, $sectionName);
         myvardump2($createdSection,3);
         $sectionId = $createdSection["id"];
@@ -349,34 +233,40 @@ function createSection($courseId, $sectionName)
 
 function createSectionEx($courseId, $sectionName)
 {
-    $uri = "/api/v1/courses/" . $courseId . "/sections";
+    global $site;
+    global $canvas_access_key;
+
+    $uri = $site . "/api/v1/courses/" . $courseId . "/sections";
     $fields = array('course_section[name]' => $sectionName);
-    $section = mypostcurl($uri, $fields);
+    $section = mypostcurl($uri, $fields, $canvas_access_key);
     return $section;
 }
 
 function createGroupEx($groupCategoryId, $groupName, $groupDescription)
 {
-  $uri = "/api/v1/group_categories/" . $groupCategoryId . "/groups"; 
+  global $site;
+  global $canvas_access_key;
+
+  $uri = $site . "/api/v1/group_categories/" . $groupCategoryId . "/groups"; 
   $fields = array( 
     'name' => $groupName, 
     'description' => $groupDescription
   ); 
   
-  $newGroup = mypostcurl($uri, $fields);
+  $newGroup = mypostcurl($uri, $fields, $canvas_access_key);
   return $newGroup;
 }
 function createGroup($groupCategoryId, $groupName, $groupDescription)
 {
-    echo "<br/>Undersøker om gruppen med navnet " . $groupName . " og beskrivelsen " . $groupDescription . " eksisterer.";
+    mydbg2("<br/>Undersøker om gruppen med navnet " . $groupName . " og beskrivelsen " . $groupDescription . " eksisterer.",2);
     $groupId = groupExist($groupName, $groupDescription, $groupCategoryId);
     if($groupId)
     {
-        echo "<br/>Gruppen eksisterte og har id " . $groupId;
+        mydbg2("<br/>Gruppen eksisterte og har id " . $groupId,2);
     }
     else
     {
-        echo "<br/>Gruppen eksisterte ikke. Oppretter den.";
+        mydbg2("<br/>Gruppen eksisterte ikke. Oppretter den.",2);
         $createdGroup = createGroupEx($groupCategoryId, $groupName, $groupDescription);
         myvardump($createdGroup);
         $groupId = $createdGroup["id"];
@@ -419,33 +309,39 @@ function groupExist($groupName, $groupDescription, $groupCategoryId)
 function getUserGroups($user_id)
 {
     global $offline;
+	global $site;
+    global $canvas_access_key;
     if($offline)
     {
         global $offlineMyGroups;
         myvardump($offlineMyGroups);
         return json_decode($offlineMyGroups,true);
     }
-    $api_endpoint = "/api/v1/users/self/groups?as_user_id=" . $user_id . "&per_page=999";
-    $result = mygetcurl($api_endpoint);
+    $api_endpoint = $site . "/api/v1/users/self/groups?as_user_id=" . $user_id . "&per_page=999";
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
 
 function getGroupCategories($course_id)
 {
     global $offline;
+	global $site;
+    global $canvas_access_key;
     if($offline)
     {
         global $offlineGroupCategories;
         return json_decode($offlineGroupCategories,true);
     }
-    $api_endpoint = "/api/v1/courses/" . $course_id . "/group_categories?per_page=999";
-    $result = mygetcurl($api_endpoint);
+    $api_endpoint = $site . "/api/v1/courses/" . $course_id . "/group_categories?per_page=999";
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
 
 function getCanvasEnrollments($user_id)
 {
     global $offline;
+    global $site;
+    global $canvas_access_key;
     
     if(!$user_id)
     {
@@ -456,8 +352,8 @@ function getCanvasEnrollments($user_id)
         global $offlineCourseEnrollments;
         return json_decode($offlineCourseEnrollments,true);
     }
-    $api_endpoint = "/api/v1/users/" .$user_id . "/enrollments?per_page=999";
-    $result = mygetcurl($api_endpoint);
+    $api_endpoint = $site . "/api/v1/users/" .$user_id . "/enrollments?per_page=999";
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
 
@@ -470,18 +366,23 @@ function printCanvasEnrollments($canvasEnrollments)
 
 function getCanvasUserFromFeideId($feideid)
 {
-    $api_endpoint = "/api/v1/accounts/self/users?search_term=" . $feideid ;
+    global $site;
+    global $canvas_access_key;
+    
+    $api_endpoint = $site . "/api/v1/accounts/self/users?search_term=" . $feideid ;
     mydbg2("getCanvasUserFromFeideId: " . $api_endpoint,3);
-    $result = mygetcurl($api_endpoint);
+    $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
 
 function addUserToGroupId($user_id,$gid)
 {
-	$uri = "/api/v1/groups/" . $gid . "/memberships";
+    global $site;
+    global $canvas_access_key;
+	$uri = $site . "/api/v1/groups/" . $gid . "/memberships";
 	$fields = array( 
 		user_id => $user_id
 	); 
-	return mypostcurl($uri, $fields);
+	return mypostcurl($uri, $fields, $canvas_access_key);
 }
 ?>

@@ -83,14 +83,14 @@ function printGroupMemberships($user_id, $course_id, $groupCategories, $myGroups
             $value = "{
             \"name\":\"" . $dataportenGroup["displayName"] . "\",
             \"description\":\"" . $dataportenGroup["id"] . "\",
-            \"membership\":\"" . $membership . 
-            "\"}";
+            \"membership\":\"" . $membership . "\",
+            \"group_category_id\":\"" . $groupCategory["id"] . "\",
+            \"course_id\":\"" . $course_id . "\",
+            \"user_id\":\"" . $user_id . "\"
+            }";
             $dp .= "<option value='" . $value .  "'>" . $dataportenGroup["displayName"] . "(" . $membership . ")</option>";
         }
         $dp .= "</select></div><div class='form-group'><button class='btn btn-primary'>Bli med</button></div>";
-        $dp .= "<input type='hidden' name='groupCategoryId' value='" . $groupCategory["id"] . "'></input>";
-        $dp .= "<input type='hidden' name='userId' value='" . $user_id . "'></input>";
-        $dp .= "<input type='hidden' name='courseId' value='" . $course_id . "'></input>";
         $dp .= "</form>";
         echo "<td>" . $dp . "</td></tr>";
     }
