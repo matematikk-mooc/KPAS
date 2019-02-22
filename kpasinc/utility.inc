@@ -19,17 +19,15 @@ function mydbg2($s, $level)
 
 	if($verbose2 && ($verbose_level >= $level))
 	{
-		echo "<p>$s</p>";
+		error_log($s);
 	}
 }
 
 
 function myjson($s)
 {
-    echo "<p>";
     $json = json_encode($s, JSON_PRETTY_PRINT); 
-    var_dump($json);
-    echo "</p>";
+    error_log($json);
 }
 
 function myvardump($v)
@@ -43,8 +41,10 @@ function myvardump2($v, $level)
 
 	if($verbose2 && ($verbose_level >= $level))
 	{
-	    echo "<p>Verbose" . $level . ">=" . $verbose_level .":</p>";
-		var_dump($v);
+        ob_start();
+        var_dump($v);
+        $debug_dump = ob_get_clean();
+        error_log($debug_dump);
 	}
 }
 

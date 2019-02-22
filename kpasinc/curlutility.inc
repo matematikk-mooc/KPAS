@@ -50,7 +50,8 @@ function mypostcurl($api_endpoint, $fields, $access_key)
 function mycurlex($url, $fields, $post, $delete, $access_key)
 {
 	global $curl_verbose;
-
+    $curl_verbose_file = null;
+    
     mydbg2("mycurlex url:" .$url,2);
 	
 	$fields_string = urlify($fields); 
