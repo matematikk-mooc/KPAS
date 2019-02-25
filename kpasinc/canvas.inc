@@ -371,7 +371,7 @@ function getCanvasUserFromFeideId($feideid)
     $api_endpoint = $site . "/api/v1/accounts/self/users?search_term=" . $feideid ;
     mydbg2("getCanvasUserFromFeideId: " . $api_endpoint,2);
     $result = mygetcurl($api_endpoint, $canvas_access_key);
-    myvardump2("getCanvasUserFromFeideId result:" . $result,2);
+    myvardump2($result,2);
     return $result;
 }
 

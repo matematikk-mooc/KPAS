@@ -87,10 +87,11 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 	
 	if ($result === FALSE) 
 	{
-		printf("cUrl error (#%d): %s<br>\n", curl_errno($curl),
-			   htmlspecialchars(curl_error($curl)));
+		mydbg(sprintf("cUrl error (#%d): %s<br>\n", curl_errno($curl),
+			   htmlspecialchars(curl_error($curl))));
 	}
 	mydbg("<p>Curl executed</p>");
+	myvardump($result);
 
 	if($curl_verbose_file)
 	{

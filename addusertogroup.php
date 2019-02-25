@@ -29,17 +29,18 @@ try {
 
     //First get Feide ID from dataporten.
     $dataportenUserInfo = KPASAPI_GetUserInfo();
-    if($dataportenUserInfo["error"])
+    if(array_key_exists('error', $dataportenUserInfo))
     {
-        $errorMessage = $dataportenUserInfo["error"] . " " . $dataportenUserInfo["message"];
+        $errorMessage = "Dataporten: " . $dataportenUserInfo["error"] . " " . $dataportenUserInfo["message"];
         throw new Exception($errorMessage);
     }
 
     //Now search for that Feide ID in Canvas.
     $feideid = getFeideIdFromDataportenUserInfo($dataportenUserInfo);
     $canvasUser = getCanvasUserFromFeideId($feideid);
-    if($canvasUser.errors && $canvasUser.errors.message) {
-        $errorMessage = $canvasUser.status . " " . $canvasUser.errors.message[0];
+    if(array_key_exists('errors', $canvasUser)) {
+        myvardump($canvasUser);
+        $errorMessage = "Canvas: " . $canvasUser["errors"][0]["message"];
         throw new Exception($errorMessage);
     } 
 
