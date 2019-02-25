@@ -107,7 +107,6 @@ function AddUserToGroup($group)
 
     mydbg2("<br/>Legger deg til som student.",2);
     $enrollment = enrollStudentInSection($userId, $courseId, $sectionId);
-    myvardump2("Studentenrollment:" . $enrollment,2);
 
     if(($membership == "owner") || ($membership == "admin"))
     {
@@ -139,7 +138,7 @@ function getRoleIdFor($roleType)
     {
         if($role["role"] == $roleType)
         {
-            myvardump($role,2);
+            myvardump2($role,3);
             $roleId = $role["id"];
             break;
         }
@@ -370,8 +369,9 @@ function getCanvasUserFromFeideId($feideid)
     global $canvas_access_key;
     
     $api_endpoint = $site . "/api/v1/accounts/self/users?search_term=" . $feideid ;
-    mydbg2("getCanvasUserFromFeideId: " . $api_endpoint,3);
+    mydbg2("getCanvasUserFromFeideId: " . $api_endpoint,2);
     $result = mygetcurl($api_endpoint, $canvas_access_key);
+    myvardump2("getCanvasUserFromFeideId result:" . $result,2);
     return $result;
 }
 

@@ -3,7 +3,7 @@ function KPASAPI_GetUserInfo() {
     global $token;
     $user_info_url = "https://auth.dataporten.no/userinfo";
     $result = mygetcurl($user_info_url, $token);
-
+    myvardump($result);
     return $result;
 }
 

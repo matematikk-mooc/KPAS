@@ -44,6 +44,7 @@ function myvardump2($v, $level)
         ob_start();
         var_dump($v);
         $debug_dump = ob_get_clean();
+        error_log("Variable dump, level=" . $level . " verbose_level=". $verbose_level);
         error_log($debug_dump);
 	}
 }

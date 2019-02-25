@@ -31,7 +31,6 @@ function mygetcurl($api_endpoint, $access_key)
 	if (!($result === FALSE)) 
 	{
         $content = json_decode($result,true);
-        myvardump($content);
         return $content;
     }
     return null;
@@ -52,7 +51,7 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 	global $curl_verbose;
     $curl_verbose_file = null;
     
-    mydbg2("mycurlex url:" .$url,2);
+    mydbg2("mycurlex url:" .$url,1);
 	
 	$fields_string = urlify($fields); 
 	$curl = curl_init();
@@ -82,7 +81,7 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER,TRUE);
 	
 
-	mydbg("<p>Executing curl start</p>");
+	mydbg("Executing curl start</p>");
 
 	$result = curl_exec($curl);
 	
