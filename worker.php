@@ -11,7 +11,6 @@ printHtmlHeader();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $jsonGroup = $_POST["group"];
     $group = json_decode($jsonGroup, true);
-    echo "Melder deg inn i " . $group;
     $result = AddUserToGroup($group);
     echo $result;
 }

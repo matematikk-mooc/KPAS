@@ -112,7 +112,7 @@ function AddUserToGroup($group)
     {
         mydbg2("<br/>Du er gruppeeier eller -admin og får tilgang til skoleledermeny for din gruppe.",2);
         $enrollment = enrollPrincipalInSection($userId, $courseId, $sectionId);
-        mydbg2("Studentenrollment:" . $enrollment,2);
+        myvardump2("Studentenrollment:" . $enrollment,2);
     }
 
     mydbg2("<br/>Legger bruker med id " . $userId . " til gruppekategori med id " . $groupCategoryId . " i gruppen med id " . $groupId,2);
@@ -367,8 +367,10 @@ function getCanvasUserFromFeideId($feideid)
 {
     global $site;
     global $canvas_access_key;
+    global $account_id;
+
     
-    $api_endpoint = $site . "/api/v1/accounts/self/users?search_term=" . $feideid ;
+    $api_endpoint = $site . "/api/v1/accounts/" . $account_id . "/users?search_term=" . $feideid ;
     mydbg2("getCanvasUserFromFeideId: " . $api_endpoint,2);
     $result = mygetcurl($api_endpoint, $canvas_access_key);
     myvardump2($result,2);

@@ -79,8 +79,8 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 	}
 	curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $access_key));
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER,TRUE);
-	
-
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 	mydbg("Executing curl start</p>");
 
 	$result = curl_exec($curl);
