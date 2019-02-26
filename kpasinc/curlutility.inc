@@ -91,7 +91,6 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 			   htmlspecialchars(curl_error($curl))));
 	}
 	mydbg("<p>Curl executed</p>");
-	myvardump($result);
 
 	if($curl_verbose_file)
 	{

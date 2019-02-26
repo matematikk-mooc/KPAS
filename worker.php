@@ -11,7 +11,7 @@ printHtmlHeader();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $jsonGroup = $_POST["group"];
     $group = json_decode($jsonGroup, true);
-    $result = AddUserToGroup($group);
+    $result = AddUserToGroup($group["user_id"], $group);
     echo $result;
 }
 printDataportenHeading();

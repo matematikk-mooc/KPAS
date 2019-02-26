@@ -84,7 +84,7 @@ function getGroups($group_category_id)
     $result = mygetcurl($api_endpoint, $canvas_access_key);
     return $result;
 }
-function AddUserToGroup($group)
+function AddUserToGroup($userId, $group, $unenrollmentIds)
 {
 //    echo $jsonGroup;
 //    var_dump($group);
@@ -92,7 +92,6 @@ function AddUserToGroup($group)
     $groupDescription = $group["description"];
     $membership = $group["membership"];
     $groupCategoryId = $group["group_category_id"];
-    $userId = $group["user_id"];
     $courseId = $group["course_id"];
 
     $groupId = createGroup($groupCategoryId, $groupName, $groupDescription);
@@ -103,7 +102,7 @@ function AddUserToGroup($group)
     mydbg2("Membership:".$membership, 2);
 
     mydbg2("<br/>Fjerner tidligere medlemskap.",2);
-    unenrollUserFromCourse($userId, $courseId);
+    unenrollUserFrom($userId, $courseId, $unenrollmentIds);
 
     mydbg2("<br/>Legger deg til som student.",2);
     $enrollment = enrollStudentInSection($userId, $courseId, $sectionId);
@@ -112,7 +111,7 @@ function AddUserToGroup($group)
     {
         mydbg2("<br/>Du er gruppeeier eller -admin og får tilgang til skoleledermeny for din gruppe.",2);
         $enrollment = enrollPrincipalInSection($userId, $courseId, $sectionId);
-        myvardump2("Studentenrollment:" . $enrollment,2);
+        myvardump2("Studentenrollment:", $enrollment,2);
     }
 
     mydbg2("<br/>Legger bruker med id " . $userId . " til gruppekategori med id " . $groupCategoryId . " i gruppen med id " . $groupId,2);
@@ -133,12 +132,12 @@ function getRoleIdFor($roleType)
     $roleId = 0;
     $uri = $site . "/api/v1/accounts/" . $account_id. "/roles";
     $roles = mygetcurl($uri, $canvas_access_key);
-    myvardump2($roles, 3);
+    myvardump2($roles, 4);
     foreach ($roles as $role)
     {
         if($role["role"] == $roleType)
         {
-            myvardump2($role,3);
+            myvardump2($role,4);
             $roleId = $role["id"];
             break;
         }
@@ -146,19 +145,15 @@ function getRoleIdFor($roleType)
     return $roleId;
 }
 
-function unenrollUserFromCourse($user_id, $course_id)
+function unenrollUserFrom($user_id, $course_id, $unenrollmentIds)
 {
     global $site;
     global $canvas_access_key;
-    $currentEnrollments = getCanvasEnrollments($user_id);
-    foreach ($currentEnrollments as $enrollment)
+    foreach ($unenrollmentIds as $unenrollmentId)
     {
-        if($enrollment["course_id"] == $course_id) {
-            $enrollment_id = $enrollment["id"];
-            mydbg2("<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $enrollment_id,2);
-            $uri = $site . "/api/v1/courses/" . $course_id . "/enrollments/"  . $enrollment_id . "?task=delete";
-            mycurldelete($uri, $canvas_access_key);
-        }
+        mydbg2("<br/>Fjerner deg fra tidligere seksjon med enrollment id " . $unenrollmentId,2);
+        $uri = $site . "/api/v1/courses/" . $course_id . "/enrollments/"  . $unenrollmentId . "?task=delete";
+        mycurldelete($uri, $canvas_access_key);
     }
 }
 

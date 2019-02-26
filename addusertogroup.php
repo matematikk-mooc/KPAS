@@ -26,6 +26,13 @@ try {
     if(!$group) {
         throw new Exception("Group parameter has invalid syntax.");
     }
+    $jsonUnenrollmentIds = $_POST["unenrollFrom"];
+    mydbg("Unenroll from " . $jsonUnenrollmentIds);
+    $unenrollmentIds = json_decode($jsonUnenrollmentIds, true);
+    if(!$unenrollmentIds) {
+        throw new Exception("unenrollFrom parameter has invalid syntax.");
+    }
+    myvardump($unenrollmentIds);
 
     //First get Feide ID from dataporten.
     $dataportenUserInfo = KPASAPI_GetUserInfo();
@@ -51,7 +58,7 @@ try {
     }
     
     //We can add the user to the specified group.
-    $result = AddUserToGroup($group);
+    $result = AddUserToGroup($user_id, $group, $unenrollmentIds);
 
 } catch (Exception $e) {
     $result = $e->getMessage();
