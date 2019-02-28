@@ -10,7 +10,6 @@ function getExtraUserInfoFromDataporten($access_token, $oauth2)
 }
 function printDataportenExtraUserInfo($extraUserInfo)
 {
-    mydbg2("<h2>Extra user info</h2>",3);
     myvardump2($extraUserInfo,3);
 }
 
@@ -28,7 +27,7 @@ function printDataportenUserInfo($userInfo)
     $userid_sec = $userInfo["user"]["userid_sec"][0];
     $feideid = getFeideIdFromDataportenUserInfo($userInfo);
 
-    mydbg2("<h2>UserInfo</h2>",3);
+    echo("<h2>UserInfo</h2>");
 
     myvardump2($userInfo,3);
     echo $feideid;
@@ -44,11 +43,10 @@ function getFeideIdFromDataportenUserInfo($userInfo)
 
 function printDataportenGroupsInfo($groupsInfo)
 {
-    mydbg2("<h2>Groups in dataporten</h2>",3);
-    myvardump2($groupsInfo,3);
+    echo("<h2>Groups in dataporten</h2>");
     foreach ($groupsInfo as $group)
     {    
-        mydbg2("<p>" . $group["id"] . "</p>",3);
+        echo("<p>" . $group["displayName"] . "</p>");
     }
 }
 function getGroupsInfoFromDataporten($access_token, $oauth2)

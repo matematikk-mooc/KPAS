@@ -13,12 +13,19 @@ $oauth2 = null;
 $initialized = false;
 
 $userInfo = "";
-
-if(isset($_GET['course_id'])) {
+$minegrupper = false;
+if(isset($_GET['minegrupper'])) {
+    $minegrupper = true;
+    $_SESSION["minegrupper"] = true;
+}
+else if(isset($_SESSION['minegrupper'])){
+    $minegrupper = true;
+}
+else if(isset($_GET['course_id'])) {
     $course_id = $_GET['course_id'];
     $_SESSION["courseId"] = $course_id;
 }
-else if(!$_SESSION["courseId"])
+else if(!isset($_SESSION["courseId"]))
 {
     echo "Mangler course_id parameter.";
     exit; 
@@ -70,6 +77,14 @@ if($initialized)
     $_SESSION["userInfo"] = $userInfo;
     $_SESSION["groups"] = $groupsInfo;
     $_SESSION["extraUserInfo"] = $extraUserInfo;
-	header('Location: worker.php');
+    if($minegrupper)
+    {
+        mydbg("Minegrupper is true");
+    	header('Location: minegrupper.php');
+    }
+    else
+    {
+    	header('Location: worker.php');
+    }
 }
 ?>
