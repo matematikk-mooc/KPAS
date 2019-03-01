@@ -28,10 +28,12 @@ try {
     }
     $jsonUnenrollmentIds = $_POST["unenrollFrom"];
     mydbg("Unenroll from " . $jsonUnenrollmentIds);
-    $unenrollmentIds = json_decode($jsonUnenrollmentIds, true);
-    if(!$unenrollmentIds == FALSE) {
-        throw new Exception("unenrollFrom parameter has invalid syntax.");
+    $unenrollmentIds = json_decode($jsonUnenrollmentIds, false);
+    if($unenrollmentIds == FALSE) {
+        $errCode = json_last_error();
+        throw new Exception("unenrollFrom parameter has invalid syntax, error_code:"  . $errCode);
     }
+    myvardump($unenrollmentIds);
 
     //First get Feide ID from dataporten.
     $dataportenUserInfo = KPASAPI_GetUserInfo();
