@@ -147,6 +147,8 @@ function getRoleIdFor($roleType)
 
 function unenrollUserFrom($user_id, $course_id, $unenrollmentIds)
 {
+    if(!$unenrollmentIds) return;
+    
     global $site;
     global $canvas_access_key;
     foreach ($unenrollmentIds as $unenrollmentId)

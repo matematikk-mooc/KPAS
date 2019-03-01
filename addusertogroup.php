@@ -29,10 +29,9 @@ try {
     $jsonUnenrollmentIds = $_POST["unenrollFrom"];
     mydbg("Unenroll from " . $jsonUnenrollmentIds);
     $unenrollmentIds = json_decode($jsonUnenrollmentIds, true);
-    if(!$unenrollmentIds) {
+    if(!$unenrollmentIds == FALSE) {
         throw new Exception("unenrollFrom parameter has invalid syntax.");
     }
-    myvardump($unenrollmentIds);
 
     //First get Feide ID from dataporten.
     $dataportenUserInfo = KPASAPI_GetUserInfo();
