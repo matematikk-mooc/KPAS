@@ -192,15 +192,15 @@ function enrollStudentInSection($user_id, $course_id, $section_id)
 
 function createSection($courseId, $sectionName)
 {
-    mydbg("<br/>Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.",2);
+    mydbg("Undersøker om seksjonen med navnet " . $sectionName . " eksisterer.",2);
     $sectionId = sectionExist($courseId, $sectionName);
     if($sectionId)
     {
-        mydbg("<br/>Seksjonen eksisterte og har id " . $sectionId,2);
+        mydbg("Seksjonen eksisterte og har id " . $sectionId,2);
     }
     else
     {
-        mydbg("<br/>Seksjonen eksisterte ikke. Oppretter den.",2);
+        mydbg("Seksjonen eksisterte ikke. Oppretter den.",2);
         $createdSection = createSectionEx($courseId, $sectionName);
         myvardump($createdSection,3);
         $sectionId = $createdSection["id"];
@@ -235,15 +235,15 @@ function createGroupEx($groupCategoryId, $groupName, $groupDescription)
 }
 function createGroup($groupCategoryId, $groupName, $groupDescription)
 {
-    mydbg("<br/>Undersøker om gruppen med navnet " . $groupName . " og beskrivelsen " . $groupDescription . " eksisterer.",2);
+    mydbg("Undersøker om gruppen med navnet " . $groupName . " og beskrivelsen " . $groupDescription . " eksisterer.",2);
     $groupId = groupExist($groupName, $groupDescription, $groupCategoryId);
     if($groupId)
     {
-        mydbg("<br/>Gruppen eksisterte og har id " . $groupId,2);
+        mydbg("Gruppen eksisterte og har id " . $groupId,2);
     }
     else
     {
-        mydbg("<br/>Gruppen eksisterte ikke. Oppretter den.",2);
+        mydbg("Gruppen eksisterte ikke. Oppretter den.",2);
         $createdGroup = createGroupEx($groupCategoryId, $groupName, $groupDescription);
         myvardump($createdGroup);
         $groupId = $createdGroup["id"];

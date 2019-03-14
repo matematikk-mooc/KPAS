@@ -26,10 +26,10 @@ try {
     if(!$group) {
         throw new Exception("Group parameter has invalid syntax.");
     }
-    $jsonUnenrollmentIds = $_POST["unenrollFrom"];
-    mydbg("Unenroll from " . $jsonUnenrollmentIds);
-    $unenrollmentIds = json_decode($jsonUnenrollmentIds, false);
-    if($unenrollmentIds == FALSE) {
+    $jsonUnenrollFrom = $_POST["unenrollFrom"];
+    mydbg("Unenroll from " . $jsonUnenrollFrom);
+    $unenrollFrom = json_decode($jsonUnenrollFrom, true);
+    if($unenrollFrom == FALSE) {
         $errCode = json_last_error();
         throw new Exception("unenrollFrom parameter has invalid syntax, error_code:"  . $errCode);
     }
@@ -59,7 +59,7 @@ try {
     }
     
     //We can add the user to the specified group.
-    $result = AddUserToGroup($user_id, $group, $unenrollmentIds);
+    $result = AddUserToGroup($user_id, $group, $unenrollFrom["unenrollmentIds"]);
 
 } catch (Exception $e) {
     $result = $e->getMessage();
