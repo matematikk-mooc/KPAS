@@ -4,33 +4,30 @@ function getExtraUserInfoFromDataporten($access_token, $oauth2)
 {
     $user_info_url = "https://api.dataporten.no/userinfo/v1/userinfo";
     $user_info = $oauth2->get_identity($access_token, $user_info_url);
-    mydbg2("getExtraUserInfoFromDataporten",3);
-    myvardump2($user_info,3);
+    mydbg("getExtraUserInfoFromDataporten");
+    myvardump($user_info);
     return $user_info;
 }
 function printDataportenExtraUserInfo($extraUserInfo)
 {
-    myvardump2($extraUserInfo,3);
+    echo("<h2>Dataporten extra user info</h2>");
+    var_dump($extraUserInfo);
 }
 
 function getUserInfoFromDataporten($access_token, $oauth2)
 {
     $user_url = "https://auth.dataporten.no/userinfo";
     $user = $oauth2->get_identity($access_token, $user_url);
-    mydbg2("getUserInfoFromDataporten",3);
-    myvardump2($user,3);
+    mydbg("getUserInfoFromDataporten");
+    myvardump($user);
     return $user;
 }
 
 function printDataportenUserInfo($userInfo)
 {
-    $userid_sec = $userInfo["user"]["userid_sec"][0];
-    $feideid = getFeideIdFromDataportenUserInfo($userInfo);
+    echo("<h2>Dataporten user info</h2>");
 
-    echo("<h2>UserInfo</h2>");
-
-    myvardump2($userInfo,3);
-    echo $feideid;
+    var_dump($userInfo);
 }
 
 function getFeideIdFromDataportenUserInfo($userInfo)
@@ -43,11 +40,10 @@ function getFeideIdFromDataportenUserInfo($userInfo)
 
 function printDataportenGroupsInfo($groupsInfo)
 {
-    echo("<h2>Groups in dataporten</h2>");
-    foreach ($groupsInfo as $group)
-    {    
-        echo("<p>" . $group["displayName"] . "</p>");
-    }
+    echo("<h2>Dataporten groups info</h2>");
+
+    var_dump($groupsInfo);
+
 }
 function getGroupsInfoFromDataporten($access_token, $oauth2)
 {

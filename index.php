@@ -7,10 +7,18 @@ require_once 'kpasinc/vars.inc';
 require_once 'kpasinc/canvas.inc';
 require_once 'kpasinc/utility.inc';
 
+if(isset($_GET['logout'])) {
+    session_destroy();
+    header('HTTP/1.1 302 Found');
+    header('Location: https://auth.dataporten.no/logout');
+}
+
 use Kasperrt\OAuth2;
 
 $oauth2 = null;
 $initialized = false;
+
+
 
 $userInfo = "";
 $minegrupper = false;
@@ -28,49 +36,37 @@ else if(isset($_GET['course_id'])) {
 else if(!isset($_SESSION["courseId"]))
 {
     echo "Mangler course_id parameter.";
+    printLogoutButton();
     exit; 
 }
 
-if(!$offline)
-{
-    $oauth2 = new OAuth2([
-        "client_id"          => $client_id,
-        "client_secret"      => $client_secret,
-        "redirect_uri"       => $redirect_uri,
-        "auth"               => "https://auth.dataporten.no/oauth/authorization",
-        "token"              => "https://auth.dataporten.no/oauth/token",
-        "response_type" 	 => "code",
-        "session"			 => true
-    ]);
-    if(isset($_GET['code'])) {
-        $code = $_GET['code'];
-        $state = $_GET['state'];
-        mydbg("Code:" . $code);
-        mydbg("State:" . $state);
-        mydbg("Getting access token...");
-        $access_token = $oauth2->get_access_token($state, $code);
-        mydbg($access_token);
-        $_SESSION["token"] = $access_token;	
-        $userInfo = getUserInfoFromDataporten($access_token, $oauth2);
-        $groupsInfo = getGroupsInfoFromDataporten($access_token, $oauth2);
-        $extraUserInfo = getExtraUserInfoFromDataporten($access_token, $oauth2);
+$oauth2 = new OAuth2([
+    "client_id"          => $client_id,
+    "client_secret"      => $client_secret,
+    "redirect_uri"       => $redirect_uri,
+    "auth"               => "https://auth.dataporten.no/oauth/authorization",
+    "token"              => "https://auth.dataporten.no/oauth/token",
+    "response_type" 	 => "code",
+    "session"			 => true
+]);
+if(isset($_GET['code'])) {
+    $code = $_GET['code'];
+    $state = $_GET['state'];
+    mydbg("Code:" . $code);
+    mydbg("State:" . $state);
+    mydbg("Getting access token...");
+    $access_token = $oauth2->get_access_token($state, $code);
+    mydbg($access_token);
+    $_SESSION["token"] = $access_token;	
+    $userInfo = getUserInfoFromDataporten($access_token, $oauth2);
+    $groupsInfo = getGroupsInfoFromDataporten($access_token, $oauth2);
+    $extraUserInfo = getExtraUserInfoFromDataporten($access_token, $oauth2);
 
-        $initialized = true;
-    } else if(isset($_GET['logout'])) {
-        session_destroy();
-        header('HTTP/1.1 302 Found');
-        header('Location: https://auth.dataporten.no/logout');
-    }else {
-        $oauth2->redirect();
-    }
-}
-else
-{
-    $userInfo = json_decode($offlineUserInfo,true);
-    $groupsInfo = json_decode($offlineGroupsInfo,true);
-    $extraUserInfo = json_decode($offlineExtraUserInfo,true);
     $initialized = true;
+}else {
+    $oauth2->redirect();
 }
+
 
 if($initialized)
 {

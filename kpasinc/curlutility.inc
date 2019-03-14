@@ -51,7 +51,7 @@ function mycurlex($url, $fields, $post, $delete, $access_key)
 	global $curl_verbose;
     $curl_verbose_file = null;
     
-    mydbg2("mycurlex url:" .$url,1);
+    mydbg("mycurlex url:" .$url);
 	
 	$fields_string = urlify($fields); 
 	$curl = curl_init();
@@ -114,9 +114,4 @@ EOD;
 	curl_close($curl);
 	return $result;
 }
-
-
-//array(6) { ["id"]=> int(1545) ["name"]=> string(22) "test13@erlendthune.com" ["sortable_name"]=> string(22) "test13@erlendthune.com" ["short_name"]=> string(22) "test13@erlendthune.com" ["login_id"]=> string(22) "test13@erlendthune.com" ["locale"]=> NULL } 
-//array(5) { ["id"]=> int(1545) ["name"]=> string(22) "test13@erlendthune.com" ["sortable_name"]=> string(22) "test13@erlendthune.com" ["short_name"]=> string(22) "test13@erlendthune.com" ["login_id"]=> string(22) "test13@erlendthune.com" } 
-
 ?>

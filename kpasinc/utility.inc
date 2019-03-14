@@ -1,7 +1,13 @@
 <?php
-function mydbg($s)
+function mydbg($s, $level=1)
 {
-    mydbg2($s,1);
+    global $verbose;
+	global $verbose_level;
+
+	if($verbose && ($verbose_level >= $level))
+	{
+		error_log($s);
+	}
 }
 function myerror($s)
 {
@@ -12,17 +18,6 @@ function myerror($s)
 EOT;
     echo $stuff;
 }
-function mydbg2($s, $level)
-{
-	global $verbose2;
-	global $verbose_level;
-
-	if($verbose2 && ($verbose_level >= $level))
-	{
-		error_log($s);
-	}
-}
-
 
 function myjson($s)
 {
@@ -30,16 +25,12 @@ function myjson($s)
     error_log($json);
 }
 
-function myvardump($v)
+function myvardump($v, $level=1)
 {
-    myvardump2($v, 1);
-}
-function myvardump2($v, $level)
-{
-	global $verbose2;
+	global $verbose;
 	global $verbose_level;
 
-	if($verbose2 && ($verbose_level >= $level))
+	if($verbose && ($verbose_level >= $level))
 	{
         ob_start();
         var_dump($v);
@@ -49,76 +40,36 @@ function myvardump2($v, $level)
 	}
 }
 
-function printGroupMemberships($user_id, $course_id, $groupCategories, $myGroups, $dataportenGroups)
+function printGroupMemberships($course_id, $groupCategories, $dataportenGroups)
 {
-    global $verbose;
-    if($verbose)
-    {
-        echo "<h3>Gruppekategorier</h3>";
-        myvardump($groupCategories);
-        echo "<p></p>";
-        myvardump($myGroups);
-    }
-    echo "<table class='table'><tr><th>Gruppekategori</th><th>Nåværende gruppe</th><th>Bli med i gruppe</th></tr>";
+    echo "<table class='table'><tr><th>Gruppekategori i Canvas</th><th>Gruppemuligheter i dataporten</th></tr>";
     foreach ($groupCategories as $groupCategory)
     {
         echo "<tr><td>" . $groupCategory["name"];
-        $groupName = "-";
-        $groupDescription = "";
         echo "</td>";
-        echo "<td>";
-        foreach ($myGroups as $myGroup)
-        {
-            if($myGroup["group_category_id"] == $groupCategory["id"])
-            {
-                $groupName = $myGroup["name"];
-                $groupDescription = $myGroup["description"];
-            }
-        }
-        echo $groupName . "</br>" . $groupDescription;
-        echo "</td>";
-        $dp = "<form method='post' action='worker.php'>  <div class='form-group'><select name='group'>";
+        $dp = "<ul>";
         foreach ($dataportenGroups as $dataportenGroup)
         {
             $membership = $dataportenGroup["membership"]["basic"];
-            $value = "{
-            \"name\":\"" . $dataportenGroup["displayName"] . "\",
-            \"description\":\"" . $dataportenGroup["id"] . "\",
-            \"membership\":\"" . $membership . "\",
-            \"group_category_id\":\"" . $groupCategory["id"] . "\",
-            \"course_id\":\"" . $course_id . "\",
-            \"user_id\":\"" . $user_id . "\"
-            }";
-            $dp .= "<option value='" . $value .  "'>" . $dataportenGroup["displayName"] . "(" . $membership . ")</option>";
+            $dp .= "<li>" . $dataportenGroup["displayName"] . "(" . $membership . ")</li>";
         }
-        $dp .= "</select></div><div class='form-group'><button class='btn btn-primary'>Bli med</button></div>";
-        $dp .= "</form>";
-        echo "<td>" . $dp . "</td></tr>";
+        echo "</lu><td>" . $dp . "</td></tr>";
     }
     echo "</table>";
 }
 function printCourseId($courseId)
 {
-    global $verbose;
-    if(!$verbose) return;
-    echo "<h1>Course id</h1>" . $courseId . "<br/>";
+    echo "<h2>Canvas course id</h2>" . $courseId . "<br/>";
 }
 
-function printGroupsForCourse($user_id, $course_id, $dataportenGroups)
+function printGroupsForCourse($course_id, $dataportenGroups)
 {
-    if(!$user_id)
-    {
-        global $site;
-        myerror("Din bruker er ikke registrert på " . $site . "<br/>Registrer deg som bruker der og prøv så igjen.");
-        return;
-    }
-    
     mydbg("Henter Canvaskurs " . $course_id);
     $course = getCanvasCourse($course_id);
-    mydbg2("<h3>" . $course["name"] . "</h3>",2);
+    mydbg("Course name" . $course["name"]);
     $groupCategories = getGroupCategories($course_id);
-    $myGroups = getUserGroups($user_id);
-    printGroupMemberships($user_id, $course_id, $groupCategories, $myGroups, $dataportenGroups);
+    echo "<h2>Canvas <-> Dataporten</h2>";
+    printGroupMemberships($course_id, $groupCategories, $dataportenGroups);
 }
 
 function printCanvasEnrollmentGroups($user_id, $canvasEnrollments, $dataportenGroups)
@@ -208,7 +159,7 @@ EOT;
 function printLogoutButton()
 {
     $stuff = <<<EOT
-    <a id="logout" href="cb.php?logout">Logout</a>
+    <a id="logout" href="index.php?logout">Logout</a>
 EOT;
     print $stuff;
 }

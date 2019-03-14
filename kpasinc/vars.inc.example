@@ -1,10 +1,8 @@
 <?php
 //DEBUGGING TRUE=ON
 $verbose = FALSE;
-$verbose2 = FALSE;
 $verbose_level = 3;
 $curl_verbose = FALSE;
-$offline = FALSE;
 
 //Dataporten app
 $client_id = "";
@@ -36,7 +34,6 @@ if(getenv('APPSETTING_DATAPORTEN_AZURE'))
     if($verbose_level)
     {
         $verbose = TRUE;
-        $verbose2 = TRUE;
     }
 }
 else
@@ -52,21 +49,4 @@ else
     $principalRoleType  = "Rektor";
     $account_id         =1;
 }
-//If testing functionality offline, the variables below are used.
-$offlineUserInfo = '{ "user": { "userid_sec": [ "feide:ath@udir.no" ], "userid": "d52f6a3b-060f-42eb-a295-ba230f621ace", "name": "Erlend Thune", "profilephoto": "p:1a888a27-5459-45cd-a029-608f73033974" }, "audience": "251def53-4e31-4269-95f2-5cc824e8d509" }';
-$offlineExtraUserInfo = '{ "eduPersonAffiliation": [ "Employee", "Member", "Staff" ], "sn": "Thune", "cn": "Erlend Thune", "title": "seniorr\u00e5dgiver", "norEduPersonLegalName": "Erlend Thune", "uid": [ "ETH" ], "eduPersonPrincipalName": "eth@udir.no", "displayName": "Erlend Thune", "manager": "CN=\u00d8ystein Nilsen,OU=Tromso,OU=Brukere,DC=ls,DC=no", "givenName": "Erlend" }';
-$offlineGroupsInfo = '[
-{ "public": true, "orgType": [ ], "displayName": "Utdanningsdirektoratet", "norEduOrgNIN": "NO970018131", "membership": { "title": "seniorr\u00e5dgiver", "basic": "member", "affiliation": [ "Employee", "Member", "Staff" ] }, "mail": "post@udir.no", "id": "fc:org:udir.no", "eduOrgLegalName": "Utdanningsdirektoratet", "type": "fc:org" },
-{ "public": true, "orgType": [ ], "displayName": "UTDANNINGSDIREKTORATET AVD TROMS\u00d8", "membership": { "primarySchool": true, "basic": "member" }, "parent": "fc:org:udir.no", "id": "fc:org:udir.no:unit:NO994580396", "type": "fc:org" },
-{ "public": true, "displayName": "Troms\u00f8 kommune", "type": "voot:ad-hoc", "membership": { "basic": "owner" }, "id": "fc:adhoc:dfa8c7ce-5398-4471-8a95-2597660e07a4" },
-{ "id": "fc:adhoc:b88671bf-f2ac-4264-8fa3-c9d78989240a", "displayName": "Avdeling for yrkesfagl\u00e6rere", "type": "voot:ad-hoc", "membership": { "basic": "owner" } },
-{ "id": "fc:adhoc:634aadec-a055-4167-93bf-1c3288aaa757", "displayName": "Avdeling for Digitale Tjenester", "membership": { "basic": "owner" }, "description": "Gruppe for avdeling for digitale tjenester.", "public": true, "type": "voot:ad-hoc" },
-{ "id": "fc:adhoc:fcb6b103-af26-48ba-a835-2020de22e74a", "displayName": "Testing", "type": "voot:ad-hoc", "membership": { "basic": "member" } }
-]';
-$offlineCanvasUser = '[{"id":6,"name":"KPAS","created_at":"2019-01-28T06:58:04-07:00","sortable_name":"KPAS","short_name":"KPAS","sis_user_id":null,"integration_id":null,"sis_import_id":null,"login_id":"eth@udir.no"}]';
-$offlineCourseEnrollments = '[{"id":8,"user_id":6,"course_id":2,"type":"TeacherEnrollment","created_at":"2019-02-04T08:44:40Z","updated_at":"2019-02-04T08:44:40Z","associated_user_id":null,"start_at":null,"end_at":null,"course_section_id":3,"root_account_id":1,"limit_privileges_to_course_section":true,"enrollment_state":"invited","role":"TeacherEnrollment","role_id":4,"last_activity_at":null,"last_attended_at":null,"total_activity_time":0,"sis_import_id":null,"sis_account_id":null,"sis_course_id":null,"course_integration_id":null,"sis_section_id":null,"section_integration_id":null,"sis_user_id":null,"html_url":"https://localhost/courses/2/users/6","user":{"id":6,"name":"KPAS","created_at":"2019-01-28T06:58:04-07:00","sortable_name":"KPAS","short_name":"KPAS","sis_user_id":null,"integration_id":null,"sis_import_id":null,"login_id":"eth@udir.no"}}]';
-$offlineCourse = '{"id":2,"name":"Testkurs1","account_id":4,"uuid":"FyiBOAJl9OLduv2KsGNUoV4GRWTYBxWSWcNIyzW6","start_at":"2019-01-22T12:38:00Z","grading_standard_id":null,"is_public":false,"created_at":"2019-01-22T12:38:18Z","course_code":"T001","default_view":"feed","root_account_id":1,"enrollment_term_id":1,"end_at":null,"public_syllabus":false,"public_syllabus_to_auth":false,"storage_quota_mb":2000,"is_public_to_auth_users":false,"hide_final_grades":false,"apply_assignment_group_weights":false,"calendar":{"ics":"https://localhost/feeds/calendars/course_FyiBOAJl9OLduv2KsGNUoV4GRWTYBxWSWcNIyzW6.ics"},"time_zone":"America/Denver","blueprint":false,"sis_course_id":null,"sis_import_id":null,"integration_id":null,"enrollments":[{"type":"teacher","role":"TeacherEnrollment","role_id":4,"user_id":1,"enrollment_state":"active"}],"workflow_state":"available","restrict_enrollments_to_course_dates":false}';
-$offlineGroupCategories = '[{"id":1,"name":"Studiegrupper","role":null,"self_signup":null,"group_limit":null,"auto_leader":null,"context_type":"Course","course_id":2,"sis_group_category_id":null,"sis_import_id":null,"protected":false,"allows_multiple_memberships":false,"is_member":false}]';
-$offlineMyGroups = '[{"id":20,"name":"Tromsø kommune","group_category_id":1, "description":"fc:org"}]';
-
 ?>

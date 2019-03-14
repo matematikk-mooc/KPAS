@@ -14,32 +14,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = AddUserToGroup($group["user_id"], $group);
     echo $result;
 }
-printDataportenHeading();
 $courseId = $_SESSION["courseId"];
 printCourseId($courseId);
 $userInfo = $_SESSION["userInfo"];
 $dataportenGroups = $_SESSION["groups"];
 $extraUserInfo = $_SESSION["extraUserInfo"];
-printCanvasHeading();
 $feideid = getFeideIdFromDataportenUserInfo($userInfo);
-mydbg2("FeideId: " . $feideid,3);
+mydbg("FeideId: " . $feideid);
 $canvasUser = null;
-if($offline)
-{
-    $canvasUser = json_decode($offlineCanvasUser,true);
-}
-else
-{
-    $canvasUser = getCanvasUserFromFeideId($feideid);
-}
-printCanvasUser($canvasUser);
+$canvasUser = getCanvasUserFromFeideId($feideid);
+printCanvasUser($canvasUser[0]);
+printDataportenUserInfo($userInfo);
+printDataportenExtraUserInfo($extraUserInfo);
 $user_id = getCanvasUserIdFromCanvasUser($canvasUser);
 printCanvasUserId($user_id);
-//$canvasEnrollments = getCanvasEnrollments($user_id);
-//printCanvasEnrollments($canvasEnrollments);
-//printCanvasEnrollmentGroups($user_id, $canvasEnrollments, $dataportenGroups);
-printGroupsForCourse($user_id, $courseId, $dataportenGroups);
-//    printCommonGroups($dataportenGroups, $canvasEnrollmentGroups);
+printDataportenGroupsInfo($dataportenGroups);
+printGroupsForCourse($courseId, $dataportenGroups);
+printLogoutButton();
 printHtmlFooter();
 
 ?>
