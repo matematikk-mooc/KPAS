@@ -2,7 +2,7 @@
 KompetansePlattform Administrativt System
 
 This is a prototype on a web service for communication between
-(Canvas)[https://github.com/instructure/canvas-lms] and (Dataporten)[https://dashboard.dataporten.no].
+[https://github.com/instructure/canvas-lms](Canvas) and [https://dashboard.dataporten.no](Dataporten).
 
 It must be installed on a PHP server and configured either using environment variables or copying vars.inc.example to vars.inc and 
 setting the variables there. The environment variables are read as follows:
@@ -25,16 +25,16 @@ setting the variables there. The environment variables are read as follows:
 
 ## Testing the connection
 You can test the connection to dataporten and Canvas by accessing index.php with a course_id parameter.
-A working example can be found here:(http://udirditkpasapp.azurewebsites.net/?course_id=286)[http://udirditkpasapp.azurewebsites.net/?course_id=286].
+A working example can be found here:[http://udirditkpasapp.azurewebsites.net/?course_id=286](http://udirditkpasapp.azurewebsites.net/?course_id=286).
 
 Note that you will not get any information about your Canvas user when accessing index.php, if you are not registered as a user in Canvas.
 To register, just login here:
-(https://bibsys.instructure.com/login/saml)[https://bibsys.instructure.com/login/saml]
+[https://bibsys.instructure.com/login/saml](https://bibsys.instructure.com/login/saml)
 
 ## Accessing KPAS from Canvas
-You need to install the MatematikkMOOC design on Canvas. Instructions on how to do that: (https://github.com/matematikk-mooc/frontend)[https://github.com/matematikk-mooc/frontend]
+You need to install the MatematikkMOOC design on Canvas. Instructions on how to do that: [https://github.com/matematikk-mooc/frontend](https://github.com/matematikk-mooc/frontend)
 
-You then need to set the configuration variables in the file (https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js)[https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js]:
+You then need to set the configuration variables in the file [https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js](https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js):
 
 ```
 //Production
@@ -44,11 +44,11 @@ You then need to set the configuration variables in the file (https://github.com
     let kpasapiurl = "https://kpas.dataporten-api.no";    
 ```
 
-If you do not want to use the entire design, you can grab (https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js)[https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js] 
+If you do not want to use the entire design, you can grab [https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js] (https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js)
 and modify it to your needs. 
 
-You also need to include this javascript library: (https://github.com/andreassolberg/jso)[https://github.com/andreassolberg/jso] which is 
-one of the OAuth libraries referenced here: (https://docs.feide.no/developer_oauth/code_and_libraries/libraries.html?highlight=jso)[https://docs.feide.no/developer_oauth/code_and_libraries/libraries.html?highlight=jso].
+You also need to include this javascript library: [https://github.com/andreassolberg/jso](https://github.com/andreassolberg/jso) which is 
+one of the OAuth libraries referenced here: [https://docs.feide.no/developer_oauth/code_and_libraries/libraries.html?highlight=jso](https://docs.feide.no/developer_oauth/code_and_libraries/libraries.html?highlight=jso).
 
 
 
