@@ -33,7 +33,7 @@ try {
         $errCode = json_last_error();
         throw new Exception("unenrollFrom parameter has invalid syntax, error_code:"  . $errCode);
     }
-    myvardump($unenrollmentIds);
+    myvardump($unenrollFrom);
 
     //First get Feide ID from dataporten.
     $dataportenUserInfo = KPASAPI_GetUserInfo();
