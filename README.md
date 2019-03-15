@@ -27,7 +27,7 @@ setting the variables there. The environment variables are read as follows:
 You can test the connection to dataporten and Canvas by accessing index.php with a course_id parameter.
 A working example can be found here:[http://udirditkpasapp.azurewebsites.net/?course_id=286](http://udirditkpasapp.azurewebsites.net/?course_id=286).
 
-Note that you will not get any information about your Canvas user when accessing index.php, if you are not registered as a user in Canvas.
+Note that you will not get any information about your Canvas user when accessing index.php in the example above if you are not registered as a user in Canvas.
 To register, just login here:
 [https://bibsys.instructure.com/login/saml](https://bibsys.instructure.com/login/saml)
 
@@ -44,7 +44,7 @@ You then need to set the configuration variables in the file [https://github.com
     let kpasapiurl = "https://kpas.dataporten-api.no";    
 ```
 
-If you do not want to use the entire design, you can grab [https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js] (https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js)
+If you do not want to use the entire design, you can grab [https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js](https://github.com/matematikk-mooc/frontend/blob/master/src/js/modules/dataporten.js)
 and modify it to your needs. 
 
 You also need to include this javascript library: [https://github.com/andreassolberg/jso](https://github.com/andreassolberg/jso) which is 
