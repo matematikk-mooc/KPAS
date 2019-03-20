@@ -11,9 +11,10 @@ $status_message = "Success";
 try {
     $result = getGroupCategories($course_id);
     if(array_key_exists('errors', $result)) {
-        $errorMessage = "Canvas: " . $canvasUser["errors"][0]["message"];
+        $errorMessage = "Canvas: " . $result["errors"][0]["message"];
         throw new Exception($errorMessage);
     } 
+
 } catch (Exception $e) {
     $result = $e->getMessage();
     $status_message = "Failure";
