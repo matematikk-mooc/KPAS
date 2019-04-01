@@ -34,15 +34,7 @@ function printCanvasUserId($user_id)
 {
     mydbg("<br/>Canvas user id: " . $user_id, 2);
 }
-function getCanvasUserIdFromCanvasUser($canvasUser)
-{
-    if(!$canvasUser)
-    {
-        return 0;
-    }
-    $user_id = $canvasUser[0]["id"];
-    return $user_id;
-}
+
 
 function getCanvasCourse($course_id)
 {
@@ -333,8 +325,27 @@ function getCanvasUserFromFeideId($feideid)
     mydbg("getCanvasUserFromFeideId: " . $api_endpoint,2);
     $result = mygetcurl($api_endpoint, $canvas_access_key);
     myvardump($result,2);
-    return $result;
+
+    if(array_key_exists('errors', $result)) {
+        myvardump($result);
+        $errorMessage = "Canvas: " . $result["errors"][0]["message"];
+        throw new Exception($errorMessage);
+    } 
+
+    mydbg("Matching " . $feideid . " with Canvas users found.");
+	foreach($result as $canvasUser) 
+	{
+        myvardump($canvasUser);
+		if($canvasUser["login_id"] == $feideid)
+		{
+            mydbg("FOUND canvasUser");
+			return $canvasUser;
+		}
+	}
+    
+    return null;
 }
+
 
 function addUserToGroupId($user_id,$gid)
 {

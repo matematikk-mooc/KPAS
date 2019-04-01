@@ -53,7 +53,7 @@ try {
     } 
 
     //Check that we found the Canvas user.
-    $user_id = getCanvasUserIdFromCanvasUser($canvasUser);
+    $user_id = getCanvasUserIdFromCanvasUser($canvasUser, $feideid);
     if(!$user_id) {
         throw new Exception("Kunne ikke finne brukeren " . $feideid . " i Canvas.");
     }
